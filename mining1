@@ -79,7 +79,7 @@ function tunnel3x3x30()
   end
 end
 
-function stripMineGänge(anzahl, abstand)
+function stripMineGaenge(anzahl, abstand)
   for i = 1, anzahl do
     turtle.turnRight()
     for j = 1, 200 do
