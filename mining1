@@ -1,68 +1,132 @@
--- miningTurtle.lua
+local whitelist = {
+  ["minecraft:coal_ore"] = true,
+  ["minecraft:iron_ore"] = true,
+  ["minecraft:gold_ore"] = true,
+  ["minecraft:diamond_ore"] = true,
+  ["minecraft:emerald_ore"] = true,
+  ["minecraft:redstone_ore"] = true,
+  ["minecraft:copper_ore"] = true,
+  ["minecraft:lapis_ore"] = true,
+  ["minecraft:deepslate_coal_ore"] = true,
+  ["minecraft:deepslate_iron_ore"] = true,
+  ["minecraft:deepslate_gold_ore"] = true,
+  ["minecraft:deepslate_diamond_ore"] = true,
+  ["minecraft:deepslate_emerald_ore"] = true,
+  ["minecraft:deepslate_redstone_ore"] = true,
+  ["minecraft:deepslate_copper_ore"] = true,
+  ["minecraft:deepslate_lapis_ore"] = true,
+}
 
--- Funktionen definieren
-function tunnel(length)
-    for i = 1, length do
-        while turtle.detect() do
-            turtle.dig()
-        end
-        turtle.forward()
+function refuel()
+  if turtle.getFuelLevel() < 100 then
+    for i = 1, 16 do
+      turtle.select(i)
+      if turtle.refuel(0) then
+        turtle.refuel(1)
+        break
+      end
     end
+  end
 end
 
-function stripMine(branches, length)
-    for i = 1, branches do
-        tunnel(length)
-        turtle.turnLeft()
-        turtle.turnLeft()
-        tunnel(length)
-        turtle.turnRight()
-        turtle.forward()
-        turtle.turnRight()
+function digDownToDepth()
+  for i = 1, 50 do
+    refuel()
+    if turtle.detectDown() then
+      turtle.digDown()
     end
-end
-
-function branchMine(branchCount, branchLength, spacing)
-    for i = 1, branchCount do
-        tunnel(spacing)
-        turtle.turnLeft()
-        tunnel(branchLength)
-        turtle.turnLeft()
-        turtle.turnLeft()
-        tunnel(branchLength)
-        turtle.turnLeft()
+    if not turtle.down() then
+      break
     end
+  end
 end
 
--- Benutzerinteraktion
-print("Was möchtest du machen?")
-print("1: Tunnel graben")
-print("2: Stripmining")
-print("3: Branchmining")
+function tryDig(dir)
+  local ok, data
+  if dir == "front" then ok, data = turtle.inspect()
+  elseif dir == "up" then ok, data = turtle.inspectUp()
+  elseif dir == "down" then ok, data = turtle.inspectDown()
+  end
 
-local auswahl = read()
-
-if auswahl == "1" then
-    print("Wie lang soll der Tunnel sein?")
-    local len = tonumber(read())
-    tunnel(len)
-
-elseif auswahl == "2" then
-    print("Wie viele Gänge?")
-    local gaenge = tonumber(read())
-    print("Wie lang sollen die Gänge sein?")
-    local länge = tonumber(read())
-    stripMine(gänge, länge)
-
-elseif auswahl == "3" then
-    print("Wie viele Aeste?")
-    local anzahl = tonumber(read())
-    print("Wie lang sollen die Aeste sein?")
-    local länge = tonumber(read())
-    print("Wie weit auseinander sollen sie sein?")
-    local abstand = tonumber(read())
-    branchMine(anzahl, länge, abstand)
-
-else
-    print("Ungültige Eingabe.")
+  if ok and data and whitelist[data.name] then
+    if dir == "front" then turtle.dig()
+    elseif dir == "up" then turtle.digUp()
+    elseif dir == "down" then turtle.digDown()
+    end
+  end
 end
+
+function digAndScanForward()
+  refuel()
+  tryDig("front")
+  tryDig("up")
+  tryDig("down")
+  while not turtle.forward() do
+    turtle.dig()
+  end
+end
+
+function tunnel3x3(length)
+  for i = 1, length do
+    digAndScanForward()
+    turtle.turnLeft()
+    tryDig("front")
+    turtle.turnRight()
+    turtle.turnRight()
+    tryDig("front")
+    turtle.turnLeft()
+  end
+end
+
+function stripMineLeft(count, spacing, depth)
+  for i = 1, count do
+    turtle.turnLeft()
+    for j = 1, depth do
+      digAndScanForward()
+    end
+    for j = 1, depth do
+      turtle.back()
+    end
+    turtle.turnRight()
+    for s = 1, spacing do
+      digAndScanForward()
+    end
+  end
+end
+
+function returnToStart(mainTunnelLength, stripCount, spacing)
+  -- Zurueck zum Tunnelanfang
+  for i = 1, stripCount * spacing do
+    turtle.back()
+  end
+  -- Drehen Richtung Tunnel
+  turtle.turnLeft()
+  -- Zurueck durch Haupttunnel
+  for i = 1, mainTunnelLength do
+    turtle.back()
+  end
+end
+
+function dropInventory()
+  turtle.turnLeft()
+  turtle.turnLeft()
+  for i = 1, 16 do
+    turtle.select(i)
+    turtle.drop()
+  end
+  turtle.turnLeft()
+  turtle.turnLeft()
+end
+
+-- Hauptprogramm
+local mainTunnelLength = 30
+local stripCount = 6
+local spacing = 2
+local stripDepth = 200
+
+refuel()
+digDownToDepth()
+tunnel3x3(mainTunnelLength)
+stripMineLeft(stripCount, spacing, stripDepth)
+returnToStart(mainTunnelLength, stripCount, spacing)
+dropInventory()
