@@ -1,4 +1,4 @@
-ocal whitelist = {
+local whitelist = {
   ["minecraft:coal_ore"] = true,
   ["minecraft:iron_ore"] = true,
   ["minecraft:gold_ore"] = true,
