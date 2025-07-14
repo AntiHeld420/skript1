@@ -49,15 +49,15 @@ if auswahl == "1" then
 
 elseif auswahl == "2" then
     print("Wie viele Gänge?")
-    local gänge = tonumber(read())
+    local gaenge = tonumber(read())
     print("Wie lang sollen die Gänge sein?")
     local länge = tonumber(read())
     stripMine(gänge, länge)
 
 elseif auswahl == "3" then
-    print("Wie viele Äste?")
+    print("Wie viele Aeste?")
     local anzahl = tonumber(read())
-    print("Wie lang sollen die Äste sein?")
+    print("Wie lang sollen die Aeste sein?")
     local länge = tonumber(read())
     print("Wie weit auseinander sollen sie sein?")
     local abstand = tonumber(read())
