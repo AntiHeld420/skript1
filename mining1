@@ -106,5 +106,5 @@ end
 refuel()
 digDownToY6()
 tunnel3x3x30()
-stripMineGaenge(5, 5)
+stripMineG=nge(5, 5)
 zurueckUndEntleeren()
