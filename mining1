@@ -29,18 +29,15 @@ function refuel()
   end
 end
 
-function digDownToY6()
-  local _, y = gps.locate()
-  while not y do
-    print("Warte auf GPS...")
-    sleep(1)
-    _, y = gps.locate()
-  end
-  while y > 6 do
+function digDownToDepth()
+  for i = 1, 50 do
     refuel()
-    if turtle.detectDown() then turtle.digDown() end
-    turtle.down()
-    _, y = gps.locate()
+    if turtle.detectDown() then
+      turtle.digDown()
+    end
+    if not turtle.down() then
+      break
+    end
   end
 end
 
@@ -118,10 +115,10 @@ function dropInventoryBack()
   turtle.turnLeft()
 end
 
--- Start
+-- Ablauf starten
 refuel()
-digDownToY6()
+digDownToDepth()
 tunnel3x3x30()
-digStripmineGange(6, 2)     -- 6 Gänge mit je 2 Block Abstand, 200 Blöcke tief
-returnToStart(30)           -- zurück durch 30 Blöcke Haupttunnel
-dropInventoryBack()         -- in Truhe hinter Startpunkt abladen
+digStripmineGange(6, 2)     -- 6 Strip-Gaenge, 2 Block Abstand, 200 lang
+returnToStart(30)           -- 30 Blöcke zurück
+dropInventoryBack()         -- Items in Truhe hinter Start entladen
