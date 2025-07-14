@@ -1,0 +1,125 @@
+-- Einfaches Mining Turtle Programm
+
+-- Einstellungen
+local gangAbstand = 5
+local gangLaenge = 200
+local tunnelLaenge = 30
+
+-- Hilfsfunktionen
+function refuel()
+  if turtle.getFuelLevel() < 50 then
+    for i=1,16 do
+      turtle.select(i)
+      if turtle.refuel(1) then return end
+    end
+  end
+end
+
+function clearJunk()
+  for i=1,16 do
+    turtle.select(i)
+    local item = turtle.getItemDetail()
+    if item and (item.name == "minecraft:cobblestone" or item.name == "minecraft:dirt" or item.name == "minecraft:sand") then
+      turtle.drop()
+    end
+  end
+end
+
+function leerInventar()
+  for i=1,16 do
+    turtle.select(i)
+    turtle.drop()
+  end
+end
+
+function grabDownToY4()
+  while true do
+    local _, y = gps.locate()
+    if y == 4 then break end
+    if turtle.detectDown() then turtle.digDown() end
+    turtle.down()
+    refuel()
+  end
+end
+
+function tunnel3x3()
+  for i=1,tunnelLaenge do
+    refuel()
+    turtle.dig()
+    turtle.forward()
+    turtle.digUp()
+    turtle.digDown()
+
+    -- Links
+    turtle.turnLeft()
+    turtle.dig()
+    turtle.forward()
+    turtle.digUp()
+    turtle.digDown()
+    turtle.back()
+    turtle.turnRight()
+
+    -- Rechts
+    turtle.turnRight()
+    turtle.dig()
+    turtle.forward()
+    turtle.digUp()
+    turtle.digDown()
+    turtle.back()
+    turtle.turnLeft()
+  end
+end
+
+function grabGang()
+  for i=1,gangLaenge do
+    refuel()
+    turtle.dig()
+    turtle.forward()
+    turtle.digUp()
+  end
+end
+
+function geheZurueck(schritte)
+  turtle.turnLeft()
+  turtle.turnLeft()
+  for i=1,schritte do
+    turtle.forward()
+  end
+  turtle.turnLeft()
+  turtle.turnLeft()
+end
+
+-- Start
+
+refuel()
+grabDownToY4()
+tunnel3x3()
+
+-- Wiederhole Gänge graben
+local gangIndex = 0
+while true do
+  local dist = gangIndex * gangAbstand
+  turtle.turnRight()
+  for i=1,dist do
+    refuel()
+    turtle.forward()
+  end
+  turtle.turnLeft()
+  grabGang()
+
+  -- Zurückgehen
+  geheZurueck(gangLaenge)
+
+  -- Leeren
+  turtle.turnLeft()
+  turtle.turnLeft()
+  for i=1,dist do turtle.back() end
+  turtle.turnLeft()
+  turtle.turnLeft()
+  turtle.back()
+  leerInventar()
+  turtle.forward()
+
+  -- Nächster Gang
+  gangIndex = gangIndex + 1
+end
