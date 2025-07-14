@@ -61,14 +61,26 @@ function digAndScanForward()
   tryDig("front")
   tryDig("up")
   tryDig("down")
+  
+  local attempts = 0
   while not turtle.forward() do
+    if attempts >= 5 then
+      print("Blockiert! Kann nicht vorwärts gehen.")
+      return false
+    end
     turtle.dig()
+    attempts = attempts + 1
   end
+  return true
 end
 
 function tunnel3x3(length)
   for i = 1, length do
-    digAndScanForward()
+    local success = digAndScanForward()
+    if not success then
+      print("Tunnel3x3: Bewegung blockiert, Abbruch.")
+      return
+    end
     turtle.turnLeft()
     tryDig("front")
     turtle.turnRight()
@@ -82,26 +94,31 @@ function stripMineLeft(count, spacing, depth)
   for i = 1, count do
     turtle.turnLeft()
     for j = 1, depth do
-      digAndScanForward()
+      local success = digAndScanForward()
+      if not success then
+        print("Stripmine: Bewegung blockiert, Abbruch.")
+        return
+      end
     end
     for j = 1, depth do
       turtle.back()
     end
     turtle.turnRight()
     for s = 1, spacing do
-      digAndScanForward()
+      local success = digAndScanForward()
+      if not success then
+        print("Stripmine: Abstand gehen blockiert, Abbruch.")
+        return
+      end
     end
   end
 end
 
 function returnToStart(mainTunnelLength, stripCount, spacing)
-  -- Zurueck zum Tunnelanfang
   for i = 1, stripCount * spacing do
     turtle.back()
   end
-  -- Drehen Richtung Tunnel
   turtle.turnLeft()
-  -- Zurueck durch Haupttunnel
   for i = 1, mainTunnelLength do
     turtle.back()
   end
