@@ -17,11 +17,10 @@ local whitelist = {
   ["minecraft:deepslate_lapis_ore"] = true,
 }
 
--- Refuel if fuel level below threshold
 function refuel()
   if turtle.getFuelLevel() < 100 then
-    for slot = 1, 16 do
-      turtle.select(slot)
+    for i = 1, 16 do
+      turtle.select(i)
       if turtle.refuel(0) then
         turtle.refuel(1)
         break
@@ -30,20 +29,21 @@ function refuel()
   end
 end
 
--- Dig down until Y=6 (using gps)
 function digDownToY6()
   local _, y = gps.locate()
-  while y and y > 6 do
+  while not y do
+    print("Warte auf GPS...")
+    sleep(1)
+    _, y = gps.locate()
+  end
+  while y > 6 do
     refuel()
-    if turtle.detectDown() then
-      turtle.digDown()
-    end
+    if turtle.detectDown() then turtle.digDown() end
     turtle.down()
     _, y = gps.locate()
   end
 end
 
--- Try to dig in the given direction if block is in whitelist
 function tryDig(direction)
   local success, data
   if direction == "front" then
@@ -55,26 +55,24 @@ function tryDig(direction)
   end
 
   if success and data and whitelist[data.name] then
-    if direction == "front" then
-      turtle.dig()
-    elseif direction == "up" then
-      turtle.digUp()
-    elseif direction == "down" then
-      turtle.digDown()
+    if direction == "front" then turtle.dig()
+    elseif direction == "up" then turtle.digUp()
+    elseif direction == "down" then turtle.digDown()
     end
   end
 end
 
--- Dig and scan forward (front, up, down), then move forward
 function digAndScanForward()
   refuel()
   tryDig("front")
   tryDig("up")
   tryDig("down")
-  turtle.forward()
+  if not turtle.forward() then
+    turtle.dig()
+    turtle.forward()
+  end
 end
 
--- Create a 3x3 tunnel 30 blocks long
 function tunnel3x3x30()
   for i = 1, 30 do
     digAndScanForward()
@@ -87,37 +85,43 @@ function tunnel3x3x30()
   end
 end
 
--- Strip mine multiple passages with given count and spacing
-function stripMinePassages(count, spacing)
-  for i = 1, count do
-    turtle.turnRight()
+function digStripmineGange(anzahl, abstand)
+  for i = 1, anzahl do
+    turtle.turnLeft()
     for j = 1, 200 do
       digAndScanForward()
     end
     for j = 1, 200 do
       turtle.back()
     end
-    turtle.turnLeft()
-    for s = 1, spacing do
-      turtle.forward()
+    turtle.turnRight()
+    for s = 1, abstand do
+      digAndScanForward()
     end
   end
 end
 
--- Return to start and empty inventory
-function returnAndEmpty()
-  for i = 1, 30 do
+function returnToStart(dist)
+  for i = 1, dist do
     turtle.back()
-  end
-  for slot = 1, 16 do
-    turtle.select(slot)
-    turtle.drop()
   end
 end
 
--- Main program execution
+function dropInventoryBack()
+  turtle.turnLeft()
+  turtle.turnLeft()
+  for i = 1, 16 do
+    turtle.select(i)
+    turtle.drop()
+  end
+  turtle.turnLeft()
+  turtle.turnLeft()
+end
+
+-- Start
 refuel()
 digDownToY6()
 tunnel3x3x30()
-stripMinePassages(5, 5)
-returnAndEmpty()
+digStripmineGange(6, 2)     -- 6 Gänge mit je 2 Block Abstand, 200 Blöcke tief
+returnToStart(30)           -- zurück durch 30 Blöcke Haupttunnel
+dropInventoryBack()         -- in Truhe hinter Startpunkt abladen
