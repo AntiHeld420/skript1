@@ -1,125 +1,111 @@
--- Einfaches Mining Turtle Programm
+-- Turtle Stripmine Pro v3 – mit Erz-Whitelist und Scan
 
--- Einstellungen
-local gangAbstand = 5
-local gangLaenge = 200
-local tunnelLaenge = 30
+local whitelist = {
+  ["minecraft:coal_ore"] = true,
+  ["minecraft:iron_ore"] = true,
+  ["minecraft:gold_ore"] = true,
+  ["minecraft:diamond_ore"] = true,
+  ["minecraft:emerald_ore"] = true,
+  ["minecraft:redstone_ore"] = true,
+  ["minecraft:copper_ore"] = true,
+  ["minecraft:lapis_ore"] = true,
+  ["minecraft:deepslate_coal_ore"] = true,
+  ["minecraft:deepslate_iron_ore"] = true,
+  ["minecraft:deepslate_gold_ore"] = true,
+  ["minecraft:deepslate_diamond_ore"] = true,
+  ["minecraft:deepslate_emerald_ore"] = true,
+  ["minecraft:deepslate_redstone_ore"] = true,
+  ["minecraft:deepslate_copper_ore"] = true,
+  ["minecraft:deepslate_lapis_ore"] = true,
+}
 
--- Hilfsfunktionen
 function refuel()
-  if turtle.getFuelLevel() < 50 then
-    for i=1,16 do
+  if turtle.getFuelLevel() < 100 then
+    for i = 1, 16 do
       turtle.select(i)
-      if turtle.refuel(1) then return end
+      if turtle.refuel(0) then
+        turtle.refuel(1)
+        break
+      end
     end
   end
 end
 
-function clearJunk()
-  for i=1,16 do
-    turtle.select(i)
-    local item = turtle.getItemDetail()
-    if item and (item.name == "minecraft:cobblestone" or item.name == "minecraft:dirt" or item.name == "minecraft:sand") then
-      turtle.drop()
+function digDownToY6()
+  local _, y = gps.locate()
+  while y and y > 6 do
+    refuel()
+    if turtle.detectDown() then turtle.digDown() end
+    turtle.down()
+    _, y = gps.locate()
+  end
+end
+
+function tryDig(direction)
+  local inspect, data
+  if direction == "front" then
+    inspect, data = turtle.inspect()
+  elseif direction == "up" then
+    inspect, data = turtle.inspectUp()
+  elseif direction == "down" then
+    inspect, data = turtle.inspectDown()
+  end
+
+  if inspect and data and whitelist[data.name] then
+    if direction == "front" then turtle.dig()
+    elseif direction == "up" then turtle.digUp()
+    elseif direction == "down" then turtle.digDown()
     end
   end
 end
 
-function leerInventar()
-  for i=1,16 do
+function digAndScanForward()
+  refuel()
+  tryDig("front")
+  tryDig("up")
+  tryDig("down")
+  turtle.forward()
+end
+
+function tunnel3x3x30()
+  for i = 1, 30 do
+    digAndScanForward()
+    turtle.turnLeft()
+    tryDig("front")
+    turtle.turnRight()
+    turtle.turnRight()
+    tryDig("front")
+    turtle.turnLeft()
+  end
+end
+
+function stripMineGänge(anzahl, abstand)
+  for i = 1, anzahl do
+    turtle.turnRight()
+    for j = 1, 200 do
+      digAndScanForward()
+    end
+    for j = 1, 200 do
+      turtle.back()
+    end
+    turtle.turnLeft()
+    for s = 1, abstand do
+      turtle.forward()
+    end
+  end
+end
+
+function zurückUndEntleeren()
+  for i = 1, 30 do turtle.back() end
+  for i = 1, 16 do
     turtle.select(i)
     turtle.drop()
   end
 end
 
-function grabDownToY4()
-  while true do
-    local _, y = gps.locate()
-    if y == 4 then break end
-    if turtle.detectDown() then turtle.digDown() end
-    turtle.down()
-    refuel()
-  end
-end
-
-function tunnel3x3()
-  for i=1,tunnelLaenge do
-    refuel()
-    turtle.dig()
-    turtle.forward()
-    turtle.digUp()
-    turtle.digDown()
-
-    -- Links
-    turtle.turnLeft()
-    turtle.dig()
-    turtle.forward()
-    turtle.digUp()
-    turtle.digDown()
-    turtle.back()
-    turtle.turnRight()
-
-    -- Rechts
-    turtle.turnRight()
-    turtle.dig()
-    turtle.forward()
-    turtle.digUp()
-    turtle.digDown()
-    turtle.back()
-    turtle.turnLeft()
-  end
-end
-
-function grabGang()
-  for i=1,gangLaenge do
-    refuel()
-    turtle.dig()
-    turtle.forward()
-    turtle.digUp()
-  end
-end
-
-function geheZurueck(schritte)
-  turtle.turnLeft()
-  turtle.turnLeft()
-  for i=1,schritte do
-    turtle.forward()
-  end
-  turtle.turnLeft()
-  turtle.turnLeft()
-end
-
--- Start
-
+-- Start:
 refuel()
-grabDownToY4()
-tunnel3x3()
-
--- Wiederhole Gänge graben
-local gangIndex = 0
-while true do
-  local dist = gangIndex * gangAbstand
-  turtle.turnRight()
-  for i=1,dist do
-    refuel()
-    turtle.forward()
-  end
-  turtle.turnLeft()
-  grabGang()
-
-  -- Zurückgehen
-  geheZurueck(gangLaenge)
-
-  -- Leeren
-  turtle.turnLeft()
-  turtle.turnLeft()
-  for i=1,dist do turtle.back() end
-  turtle.turnLeft()
-  turtle.turnLeft()
-  turtle.back()
-  leerInventar()
-  turtle.forward()
-
-  -- Nächster Gang
-  gangIndex = gangIndex + 1
-end
+digDownToY6()
+tunnel3x3x30()
+stripMineGänge(5, 5)
+zurückUndEntleeren()
