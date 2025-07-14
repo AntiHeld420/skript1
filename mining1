@@ -1,6 +1,4 @@
--- Turtle Stripmine Pro v3 – mit Erz-Whitelist und Scan
-
-local whitelist = {
+ocal whitelist = {
   ["minecraft:coal_ore"] = true,
   ["minecraft:iron_ore"] = true,
   ["minecraft:gold_ore"] = true,
@@ -19,10 +17,11 @@ local whitelist = {
   ["minecraft:deepslate_lapis_ore"] = true,
 }
 
+-- Refuel if fuel level below threshold
 function refuel()
   if turtle.getFuelLevel() < 100 then
-    for i = 1, 16 do
-      turtle.select(i)
+    for slot = 1, 16 do
+      turtle.select(slot)
       if turtle.refuel(0) then
         turtle.refuel(1)
         break
@@ -31,34 +30,42 @@ function refuel()
   end
 end
 
+-- Dig down until Y=6 (using gps)
 function digDownToY6()
   local _, y = gps.locate()
   while y and y > 6 do
     refuel()
-    if turtle.detectDown() then turtle.digDown() end
+    if turtle.detectDown() then
+      turtle.digDown()
+    end
     turtle.down()
     _, y = gps.locate()
   end
 end
 
+-- Try to dig in the given direction if block is in whitelist
 function tryDig(direction)
-  local inspect, data
+  local success, data
   if direction == "front" then
-    inspect, data = turtle.inspect()
+    success, data = turtle.inspect()
   elseif direction == "up" then
-    inspect, data = turtle.inspectUp()
+    success, data = turtle.inspectUp()
   elseif direction == "down" then
-    inspect, data = turtle.inspectDown()
+    success, data = turtle.inspectDown()
   end
 
-  if inspect and data and whitelist[data.name] then
-    if direction == "front" then turtle.dig()
-    elseif direction == "up" then turtle.digUp()
-    elseif direction == "down" then turtle.digDown()
+  if success and data and whitelist[data.name] then
+    if direction == "front" then
+      turtle.dig()
+    elseif direction == "up" then
+      turtle.digUp()
+    elseif direction == "down" then
+      turtle.digDown()
     end
   end
 end
 
+-- Dig and scan forward (front, up, down), then move forward
 function digAndScanForward()
   refuel()
   tryDig("front")
@@ -67,6 +74,7 @@ function digAndScanForward()
   turtle.forward()
 end
 
+-- Create a 3x3 tunnel 30 blocks long
 function tunnel3x3x30()
   for i = 1, 30 do
     digAndScanForward()
@@ -79,8 +87,9 @@ function tunnel3x3x30()
   end
 end
 
-function stripMineGaenge(anzahl, abstand)
-  for i = 1, anzahl do
+-- Strip mine multiple passages with given count and spacing
+function stripMinePassages(count, spacing)
+  for i = 1, count do
     turtle.turnRight()
     for j = 1, 200 do
       digAndScanForward()
@@ -89,22 +98,26 @@ function stripMineGaenge(anzahl, abstand)
       turtle.back()
     end
     turtle.turnLeft()
-    for s = 1, abstand do
+    for s = 1, spacing do
       turtle.forward()
     end
   end
 end
 
-function zurueckUndEntleeren()
-  for i = 1, 30 do turtle.back() end
-  for i = 1, 16 do
-    turtle.select(i)
+-- Return to start and empty inventory
+function returnAndEmpty()
+  for i = 1, 30 do
+    turtle.back()
+  end
+  for slot = 1, 16 do
+    turtle.select(slot)
     turtle.drop()
   end
 end
 
+-- Main program execution
 refuel()
 digDownToY6()
 tunnel3x3x30()
-stripMineG=nge(5, 5)
-zurueckUndEntleeren()
+stripMinePassages(5, 5)
+returnAndEmpty()
