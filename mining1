@@ -1,124 +1,68 @@
-local whitelist = {
-  ["minecraft:coal_ore"] = true,
-  ["minecraft:iron_ore"] = true,
-  ["minecraft:gold_ore"] = true,
-  ["minecraft:diamond_ore"] = true,
-  ["minecraft:emerald_ore"] = true,
-  ["minecraft:redstone_ore"] = true,
-  ["minecraft:copper_ore"] = true,
-  ["minecraft:lapis_ore"] = true,
-  ["minecraft:deepslate_coal_ore"] = true,
-  ["minecraft:deepslate_iron_ore"] = true,
-  ["minecraft:deepslate_gold_ore"] = true,
-  ["minecraft:deepslate_diamond_ore"] = true,
-  ["minecraft:deepslate_emerald_ore"] = true,
-  ["minecraft:deepslate_redstone_ore"] = true,
-  ["minecraft:deepslate_copper_ore"] = true,
-  ["minecraft:deepslate_lapis_ore"] = true,
-}
+-- miningTurtle.lua
 
-function refuel()
-  if turtle.getFuelLevel() < 100 then
-    for i = 1, 16 do
-      turtle.select(i)
-      if turtle.refuel(0) then
-        turtle.refuel(1)
-        break
-      end
+-- Funktionen definieren
+function tunnel(length)
+    for i = 1, length do
+        while turtle.detect() do
+            turtle.dig()
+        end
+        turtle.forward()
     end
-  end
 end
 
-function digDownToDepth()
-  for i = 1, 50 do
-    refuel()
-    if turtle.detectDown() then
-      turtle.digDown()
+function stripMine(branches, length)
+    for i = 1, branches do
+        tunnel(length)
+        turtle.turnLeft()
+        turtle.turnLeft()
+        tunnel(length)
+        turtle.turnRight()
+        turtle.forward()
+        turtle.turnRight()
     end
-    if not turtle.down() then
-      break
+end
+
+function branchMine(branchCount, branchLength, spacing)
+    for i = 1, branchCount do
+        tunnel(spacing)
+        turtle.turnLeft()
+        tunnel(branchLength)
+        turtle.turnLeft()
+        turtle.turnLeft()
+        tunnel(branchLength)
+        turtle.turnLeft()
     end
-  end
 end
 
-function tryDig(direction)
-  local success, data
-  if direction == "front" then
-    success, data = turtle.inspect()
-  elseif direction == "up" then
-    success, data = turtle.inspectUp()
-  elseif direction == "down" then
-    success, data = turtle.inspectDown()
-  end
+-- Benutzerinteraktion
+print("Was möchtest du machen?")
+print("1: Tunnel graben")
+print("2: Stripmining")
+print("3: Branchmining")
 
-  if success and data and whitelist[data.name] then
-    if direction == "front" then turtle.dig()
-    elseif direction == "up" then turtle.digUp()
-    elseif direction == "down" then turtle.digDown()
-    end
-  end
+local auswahl = read()
+
+if auswahl == "1" then
+    print("Wie lang soll der Tunnel sein?")
+    local len = tonumber(read())
+    tunnel(len)
+
+elseif auswahl == "2" then
+    print("Wie viele Gänge?")
+    local gänge = tonumber(read())
+    print("Wie lang sollen die Gänge sein?")
+    local länge = tonumber(read())
+    stripMine(gänge, länge)
+
+elseif auswahl == "3" then
+    print("Wie viele Äste?")
+    local anzahl = tonumber(read())
+    print("Wie lang sollen die Äste sein?")
+    local länge = tonumber(read())
+    print("Wie weit auseinander sollen sie sein?")
+    local abstand = tonumber(read())
+    branchMine(anzahl, länge, abstand)
+
+else
+    print("Ungültige Eingabe.")
 end
-
-function digAndScanForward()
-  refuel()
-  tryDig("front")
-  tryDig("up")
-  tryDig("down")
-  if not turtle.forward() then
-    turtle.dig()
-    turtle.forward()
-  end
-end
-
-function tunnel3x3x30()
-  for i = 1, 30 do
-    digAndScanForward()
-    turtle.turnLeft()
-    tryDig("front")
-    turtle.turnRight()
-    turtle.turnRight()
-    tryDig("front")
-    turtle.turnLeft()
-  end
-end
-
-function digStripmineGange(anzahl, abstand)
-  for i = 1, anzahl do
-    turtle.turnLeft()
-    for j = 1, 200 do
-      digAndScanForward()
-    end
-    for j = 1, 200 do
-      turtle.back()
-    end
-    turtle.turnRight()
-    for s = 1, abstand do
-      digAndScanForward()
-    end
-  end
-end
-
-function returnToStart(dist)
-  for i = 1, dist do
-    turtle.back()
-  end
-end
-
-function dropInventoryBack()
-  turtle.turnLeft()
-  turtle.turnLeft()
-  for i = 1, 16 do
-    turtle.select(i)
-    turtle.drop()
-  end
-  turtle.turnLeft()
-  turtle.turnLeft()
-end
-
--- Ablauf starten
-refuel()
-digDownToDepth()
-tunnel3x3x30()
-digStripmineGange(6, 2)     -- 6 Strip-Gaenge, 2 Block Abstand, 200 lang
-returnToStart(30)           -- 30 Blöcke zurück
-dropInventoryBack()         -- Items in Truhe hinter Start entladen
