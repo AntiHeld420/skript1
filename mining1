@@ -29,18 +29,6 @@ function refuel()
   end
 end
 
-function digDownToDepth()
-  for i = 1, 50 do
-    refuel()
-    if turtle.detectDown() then
-      turtle.digDown()
-    end
-    if not turtle.down() then
-      break
-    end
-  end
-end
-
 function tryDig(dir)
   local ok, data
   if dir == "front" then ok, data = turtle.inspect()
@@ -56,29 +44,64 @@ function tryDig(dir)
   end
 end
 
+function clearBlockDown()
+  if turtle.detectDown() then
+    turtle.digDown()
+  end
+end
+
+function clearBlockFront()
+  if turtle.detect() then
+    turtle.dig()
+  end
+end
+
+function moveForward()
+  local attempts = 0
+  while not turtle.forward() do
+    if attempts >= 10 then
+      print("Konnte nicht vorwärts gehen. Blockiert.")
+      return false
+    end
+    clearBlockFront()
+    attempts = attempts + 1
+    sleep(0.5)
+  end
+  return true
+end
+
 function digAndScanForward()
   refuel()
   tryDig("front")
   tryDig("up")
   tryDig("down")
-  
-  local attempts = 0
-  while not turtle.forward() do
-    if attempts >= 5 then
-      print("Blockiert! Kann nicht vorwärts gehen.")
-      return false
-    end
-    turtle.dig()
-    attempts = attempts + 1
+
+  clearBlockDown()
+
+  local success = moveForward()
+  if not success then
+    return false
   end
   return true
+end
+
+function digDownToDepth()
+  for i = 1, 50 do
+    refuel()
+    if turtle.detectDown() then
+      turtle.digDown()
+    end
+    if not turtle.down() then
+      break
+    end
+  end
 end
 
 function tunnel3x3(length)
   for i = 1, length do
     local success = digAndScanForward()
     if not success then
-      print("Tunnel3x3: Bewegung blockiert, Abbruch.")
+      print("Tunnel blockiert. Stoppe.")
       return
     end
     turtle.turnLeft()
@@ -96,7 +119,7 @@ function stripMineLeft(count, spacing, depth)
     for j = 1, depth do
       local success = digAndScanForward()
       if not success then
-        print("Stripmine: Bewegung blockiert, Abbruch.")
+        print("Stripmine blockiert. Stoppe.")
         return
       end
     end
@@ -107,7 +130,7 @@ function stripMineLeft(count, spacing, depth)
     for s = 1, spacing do
       local success = digAndScanForward()
       if not success then
-        print("Stripmine: Abstand gehen blockiert, Abbruch.")
+        print("Stripmine Abstand blockiert. Stoppe.")
         return
       end
     end
