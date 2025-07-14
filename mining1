@@ -79,7 +79,7 @@ function tunnel3x3x30()
   end
 end
 
-function stripMineGcnge(anzahl, abstand)
+function stripMineGaenge(anzahl, abstand)
   for i = 1, anzahl do
     turtle.turnRight()
     for j = 1, 200 do
@@ -95,7 +95,7 @@ function stripMineGcnge(anzahl, abstand)
   end
 end
 
-function zurückUndEntleeren()
+function zurueckUndEntleeren()
   for i = 1, 30 do turtle.back() end
   for i = 1, 16 do
     turtle.select(i)
@@ -103,9 +103,8 @@ function zurückUndEntleeren()
   end
 end
 
--- Start:
 refuel()
 digDownToY6()
 tunnel3x3x30()
-stripMineGänge(5, 5)
+stripMineGaenge(5, 5)
 zurueckUndEntleeren()
