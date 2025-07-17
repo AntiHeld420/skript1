@@ -1,6 +1,4 @@
--- raum_fuellen.lua mit automatischer Blocknachfuellung
-
--- Funktion: Sicher vorwaerts bewegen
+-- Funktion: Sicher vorwärts bewegen
 function sicherVor()
     while not turtle.forward() do
         turtle.dig()
@@ -22,28 +20,28 @@ function umdrehen()
     turtle.turnLeft()
 end
 
--- Funktion: Blocke auffuellen aus Kiste hinter Startpunkt
+-- Funktion: Blöcke auffüllen aus Kiste hinter Startpunkt
 function auffuellenAusKiste()
-    print("Hole neue Blocke aus der Kiste...")
+    print("Hole neue Blöcke aus der Kiste...")
 
     -- Aktuelle Position speichern
     umdrehen()
     sicherVor()  -- Zur Kiste hinter Start
 
-    -- Blocke aufnehmen (aus jedem Slot in der Kiste)
+    -- Blöcke aufnehmen (aus jedem Slot in der Kiste)
     for i = 1, 16 do
         turtle.select(i)
         turtle.suck()
     end
 
-    -- Zurueck zur Arbeitsposition
+    -- Zurück zur Arbeitsposition
     umdrehen()
     sicherVor()
-    turtle.select(1) -- Zurueck zu Slot 1
+    turtle.select(1) -- Zurück zu Slot 1
 end
 
--- Funktion: pruefen, ob noch Blocke vorhanden
-function hatBlocke()
+-- Funktion: prüfen, ob noch Blöcke vorhanden
+function hatBlöcke()
     for i = 1, 16 do
         if turtle.getItemCount(i) > 0 then
             return true
@@ -65,26 +63,26 @@ function platzierenUnten()
     return false
 end
 
--- Eingabe der Raumgroesse
-print("Gib die Seitenlaenge des Raums (n) ein:")
+-- Eingabe der Raumgröße
+print("Gib die Seitenlänge des Raums (n) ein:")
 local eingabe = read()
 local n = tonumber(eingabe)
 
 if not n or n < 1 then
-    print("Ungueltige Eingabe.")
+    print("Ungültige Eingabe.")
     return
 end
 
-print("Starte Fuellen von " .. n .. " x " .. n .. " x " .. n .. " Blocken.")
+print("Starte Füllen von " .. n .. " x " .. n .. " x " .. n .. " Blöcken.")
 
--- Hauptschleife: Ebene fuer Ebene
+-- Hauptschleife: Ebene für Ebene
 for ebene = 1, n do
     for reihe = 1, n do
         for spalte = 1, n do
-            if not hatBlocke() then
+            if not hatBlöcke() then
                 auffuellenAusKiste()
-                if not hatBlocke() then
-                    print("Keine Blocke mehr verfuegbar. Abbruch.")
+                if not hatBlöcke() then
+                    print("Keine Blöcke mehr verfügbar. Abbruch.")
                     return
                 end
             end
@@ -121,10 +119,10 @@ for ebene = 1, n do
         turtle.turnLeft()
     end
 
-    -- Naechste Ebene
+    -- Nächste Ebene
     if ebene < n then
         sicherHoch()
     end
 end
 
-print("Fertig! Der Raum wurde vollstaendig gefuellt.")
+print("Fertig! Der Raum wurde vollständig gefüllt.")
