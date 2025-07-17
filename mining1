@@ -50,4 +50,58 @@ function hatBlocke()
     return false
 end
 
--- Funkti
+-- Funktion: versuche Block unter Turtle zu platzieren
+function platzierenUnten()
+    for i = 1, 16 do
+        turtle.select(i)
+        if turtle.getItemCount() > 0 then
+            if turtle.placeDown() then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+-- Eingabe der Raumgroesse
+print("Gib die Seitenlaenge des Raums (n) ein:")
+local eingabe = read()
+local n = tonumber(eingabe)
+
+if not n or n < 1 then
+    print("Ungültige Eingabe.")
+    return
+end
+
+print("Starte Fuellen von " .. n .. " x " .. n .. " x " .. n .. " Blocken.")
+
+-- Hauptschleife: Ebene fuer Ebene
+for ebene = 1, n do
+    for reihe = 1, n do
+        for spalte = 1, n do
+            if not hatBlocke() then
+                auffuellenAusKiste()
+                if not hatBlocke() then
+                    print("Keine Blocke mehr verfuegbar. Abbruch.")
+                    return
+                end
+            end
+
+            platzierenUnten()
+
+            if spalte < n then
+                sicherVor()
+            end
+        end
+
+        -- Zeilenwechsel
+        if reihe < n then
+            if reihe % 2 == 1 then
+                turtle.turnRight()
+                sicherVor()
+                turtle.turnRight()
+            else
+                turtle.turnLeft()
+                sicherVor()
+                turtle.turnLeft()
+            end
