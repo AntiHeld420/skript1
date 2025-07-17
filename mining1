@@ -1,8 +1,20 @@
--- Funktion: Sicher vorwaerts bewegen
+-- Funktion: Sicher vorwaerts bewegen, ohne Kisten abzubauen
 function sicherVor()
-    while not turtle.forward() do
-        turtle.dig()
-        sleep(0.5)
+    while true do
+        -- Überprüfen, ob der Block vor der Turtle eine Kiste ist
+        local success, block = turtle.inspect()  -- Prüft den Block vor der Turtle
+        if not success or block.name ~= "minecraft:chest" then
+            -- Wenn kein Kistenblock, dann vorwärts bewegen und graben (falls nötig)
+            if not turtle.forward() then
+                turtle.dig()
+                sleep(0.5)
+            end
+            break  -- Verlasse die Schleife, sobald die Turtle erfolgreich vorwärts gegangen ist
+        else
+            -- Wenn eine Kiste vor der Turtle ist, einfach darüber hinweg gehen
+            turtle.forward()
+            break
+        end
     end
 end
 
