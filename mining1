@@ -64,15 +64,20 @@ end
 
 -- Funktion: versuche Block unter Turtle zu platzieren
 function platzierenUnten()
+    -- Sicherstellen, dass es einen Block zum Platzieren gibt
     for i = 1, 16 do
-        turtle.select(i)
-        if turtle.getItemCount() > 0 then
-            if turtle.placeDown() then
-                return true
+        turtle.select(i)  -- Wähle den Slot
+        if turtle.getItemCount(i) > 0 then  -- Wenn der Slot nicht leer ist
+            local success = turtle.placeDown()  -- Versuche, den Block zu platzieren
+            if success then
+                return true  -- Erfolgreich platziert
+            else
+                print("Fehler beim Platzieren des Blocks im Slot " .. i)
+                return false  -- Fehler beim Platzieren
             end
         end
     end
-    return false
+    return false  -- Keine Blocke vorhanden
 end
 
 -- Raumgröße festlegen (testweise auf 5 setzen)
@@ -95,7 +100,11 @@ for ebene = 1, n do
                 end
             end
 
-            platzierenUnten()
+            -- Versuche, einen Block unter der Turtle zu platzieren
+            if not platzierenUnten() then
+                print("Fehler beim Platzieren des Blocks!")
+                return  -- Wenn Platzierung nicht funktioniert, abbrechen
+            end
 
             -- Vorwärts bewegen, wenn wir noch nicht am Ende der Spalte sind
             if spalte < n then
