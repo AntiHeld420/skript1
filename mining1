@@ -1,4 +1,4 @@
--- Funktion: Sicher vorwärts bewegen
+-- Funktion: Sicher vorwaerts bewegen
 function sicherVor()
     while not turtle.forward() do
         turtle.dig()
@@ -20,28 +20,28 @@ function umdrehen()
     turtle.turnLeft()
 end
 
--- Funktion: Blöcke auffüllen aus Kiste hinter Startpunkt
+-- Funktion: Blocke auffuellen aus Kiste hinter Startpunkt
 function auffuellenAusKiste()
-    print("Hole neue Blöcke aus der Kiste...")
+    print("Hole neue Blocke aus der Kiste...")
 
     -- Aktuelle Position speichern
     umdrehen()
     sicherVor()  -- Zur Kiste hinter Start
 
-    -- Blöcke aufnehmen (aus jedem Slot in der Kiste)
+    -- Blocke aufnehmen (aus jedem Slot in der Kiste)
     for i = 1, 16 do
         turtle.select(i)
         turtle.suck()  -- Diese Funktion nimmt nur die Items aus der Kiste und baut sie nicht ab
     end
 
-    -- Zurück zur Arbeitsposition
+    -- Zurueck zur Arbeitsposition
     umdrehen()
     sicherVor()
-    turtle.select(1) -- Zurück zu Slot 1
+    turtle.select(1) -- Zurueck zu Slot 1
 end
 
--- Funktion: prüfen, ob noch Blöcke vorhanden
-function hatBlöcke()
+-- Funktion: pruefen, ob noch Blocke vorhanden
+function hatBlocke()
     for i = 1, 16 do
         if turtle.getItemCount(i) > 0 then
             return true
@@ -50,79 +50,4 @@ function hatBlöcke()
     return false
 end
 
--- Funktion: versuche Block unter Turtle zu platzieren
-function platzierenUnten()
-    for i = 1, 16 do
-        turtle.select(i)
-        if turtle.getItemCount() > 0 then
-            if turtle.placeDown() then
-                return true
-            end
-        end
-    end
-    return false
-end
-
--- Eingabe der Raumgröße
-print("Gib die Seitenlänge des Raums (n) ein:")
-local eingabe = read()
-local n = tonumber(eingabe)
-
-if not n or n < 1 then
-    print("Ungültige Eingabe.")
-    return
-end
-
-print("Starte Füllen von " .. n .. " x " .. n .. " x " .. n .. " Blöcken.")
-
--- Hauptschleife: Ebene für Ebene
-for ebene = 1, n do
-    for reihe = 1, n do
-        for spalte = 1, n do
-            if not hatBlöcke() then
-                auffuellenAusKiste()
-                if not hatBlöcke() then
-                    print("Keine Blöcke mehr verfügbar. Abbruch.")
-                    return
-                end
-            end
-
-            platzierenUnten()
-
-            if spalte < n then
-                sicherVor()
-            end
-        end
-
-        -- Zeilenwechsel
-        if reihe < n then
-            if reihe % 2 == 1 then
-                turtle.turnRight()
-                sicherVor()
-                turtle.turnRight()
-            else
-                turtle.turnLeft()
-                sicherVor()
-                turtle.turnLeft()
-            end
-        end
-    end
-
-    -- Wieder zum Start der Ebene
-    if n % 2 == 1 then
-        turtle.turnRight()
-        for i = 1, n - 1 do sicherVor() end
-        turtle.turnRight()
-    else
-        turtle.turnLeft()
-        for i = 1, n - 1 do sicherVor() end
-        turtle.turnLeft()
-    end
-
-    -- Nächste Ebene
-    if ebene < n then
-        sicherHoch()
-    end
-end
-
-print("Fertig! Der Raum wurde vollständig gefüllt.")
+-- Funkti
