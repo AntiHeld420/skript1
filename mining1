@@ -70,8 +70,11 @@ print("Starte Fuellen von " .. n .. " x " .. n .. " x " .. n .. " Blocken.")
 
 -- Hauptschleife: Ebene fuer Ebene
 for ebene = 1, n do
+    -- Erste Schleife: Jede Reihe im Raum
     for reihe = 1, n do
+        -- Zweite Schleife: Jede Spalte in der Reihe
         for spalte = 1, n do
+            -- Falls keine Blocke mehr vorhanden sind, hole sie aus der Kiste
             if not hatBlocke() then
                 auffuellenAusKiste()
                 if not hatBlocke() then
@@ -82,12 +85,13 @@ for ebene = 1, n do
 
             platzierenUnten()
 
+            -- Vorwärts bewegen, wenn wir noch nicht am Ende der Spalte sind
             if spalte < n then
                 sicherVor()
             end
-        end
+        end -- Ende der zweiten Schleife (Spalten)
 
-        -- Zeilenwechsel
+        -- Wechsel der Reihe
         if reihe < n then
             if reihe % 2 == 1 then
                 turtle.turnRight()
@@ -98,10 +102,10 @@ for ebene = 1, n do
                 sicherVor()
                 turtle.turnLeft()
             end
-        end
-    end
+        end -- Ende der ersten Schleife (Reihen)
+    end -- Ende der ersten Schleife (Reihen)
 
-    -- Wieder zum Start der Ebene
+    -- Zurück zum Start der Ebene
     if n % 2 == 1 then
         turtle.turnRight()
         for i = 1, n - 1 do sicherVor() end
@@ -112,10 +116,10 @@ for ebene = 1, n do
         turtle.turnLeft()
     end
 
-    -- Naechste Ebene
+    -- Gehe zur nächsten Ebene, falls noch nicht fertig
     if ebene < n then
         sicherHoch()
     end
-end
+end -- Ende der Hauptschleife (Ebenen)
 
 print("Fertig! Der Raum wurde vollstaendig gefuellt.")
