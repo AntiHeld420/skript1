@@ -1,6 +1,6 @@
--- raum_füllen.lua mit automatischer Blocknachfüllung
+-- raum_fuellen.lua mit automatischer Blocknachfuellung
 
--- Funktion: Sicher vorwärts bewegen
+-- Funktion: Sicher vorwaerts bewegen
 function sicherVor()
     while not turtle.forward() do
         turtle.dig()
@@ -22,27 +22,27 @@ function umdrehen()
     turtle.turnLeft()
 end
 
--- Funktion: Blöcke auffüllen aus Kiste hinter Startpunkt
-function auffullenAusKiste()
+-- Funktion: Blocke auffuellen aus Kiste hinter Startpunkt
+function auffuellenAusKiste()
     print("Hole neue Blocke aus der Kiste...")
 
-    -- aktuelle Position speichern
+    -- Aktuelle Position speichern
     umdrehen()
     sicherVor()  -- Zur Kiste hinter Start
 
-    -- Blöcke aufnehmen (aus jedem Slot in der Kiste)
+    -- Blocke aufnehmen (aus jedem Slot in der Kiste)
     for i = 1, 16 do
         turtle.select(i)
         turtle.suck()
     end
 
-    -- Zurück zur Arbeitsposition
+    -- Zurueck zur Arbeitsposition
     umdrehen()
     sicherVor()
-    turtle.select(1) -- zurück zu Slot 1
+    turtle.select(1) -- Zurueck zu Slot 1
 end
 
--- Funktion: prüfen, ob noch Blöcke vorhanden
+-- Funktion: pruefen, ob noch Blocke vorhanden
 function hatBlocke()
     for i = 1, 16 do
         if turtle.getItemCount(i) > 0 then
@@ -65,8 +65,8 @@ function platzierenUnten()
     return false
 end
 
--- Eingabe der Raumgröße
-print("Gib die Seitenlange des Raums (n) ein:")
+-- Eingabe der Raumgroesse
+print("Gib die Seitenlaenge des Raums (n) ein:")
 local eingabe = read()
 local n = tonumber(eingabe)
 
@@ -77,12 +77,12 @@ end
 
 print("Starte Fuellen von " .. n .. " x " .. n .. " x " .. n .. " Blocken.")
 
--- Hauptschleife: Ebene für Ebene
+-- Hauptschleife: Ebene fuer Ebene
 for ebene = 1, n do
     for reihe = 1, n do
         for spalte = 1, n do
             if not hatBlocke() then
-                auffullenAusKiste()
+                auffuellenAusKiste()
                 if not hatBlocke() then
                     print("Keine Blocke mehr verfuegbar. Abbruch.")
                     return
@@ -121,7 +121,7 @@ for ebene = 1, n do
         turtle.turnLeft()
     end
 
-    -- Nächste Ebene
+    -- Naechste Ebene
     if ebene < n then
         sicherHoch()
     end
