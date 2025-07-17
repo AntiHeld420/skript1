@@ -1,11 +1,8 @@
--- Minimaler Test-Code ohne Sonderzeichen
-
-print("Gib eine Zahl ein:")
-local eingabe = read()
-local n = tonumber(eingabe)
-
-if not n or n < 1 then
-    print("Ungueltige Eingabe.")
-else
-    print("Du hast die Zahl " .. n .. " eingegeben.")
+-- Test: Turtle vorwärts bewegen
+print("Die Turtle wird sich nun vorwaerts bewegen.")
+while not turtle.forward() do
+    print("Turtle blockiert, wird abgebaut...")
+    turtle.dig()
+    sleep(0.5)
 end
+print("Turtle ist erfolgreich vorwärts gegangen.")
