@@ -1,8 +1,7 @@
--- Test: Turtle vorwärts bewegen
-print("Die Turtle wird sich nun vorwaerts bewegen.")
-while not turtle.forward() do
-    print("Turtle blockiert, wird abgebaut...")
-    turtle.dig()
-    sleep(0.5)
+-- Test: Blocke unter der Turtle platzieren
+print("Turtle wird nun einen Block unter sich platzieren.")
+if turtle.placeDown() then
+    print("Block wurde erfolgreich platziert!")
+else
+    print("Fehler beim Platzieren des Blocks.")
 end
-print("Turtle ist erfolgreich vorwärts gegangen.")
