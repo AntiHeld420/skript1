@@ -63,15 +63,8 @@ function platzierenUnten()
     return false
 end
 
--- Eingabe der Raumgroesse
-print("Gib die Seitenlaenge des Raums (n) ein:")
-local eingabe = read()
-local n = tonumber(eingabe)
-
-if not n or n < 1 then
-    print("Ungültige Eingabe.")
-    return
-end
+-- Raumgröße festlegen (testweise auf 5 setzen)
+local n = 5
 
 print("Starte Fuellen von " .. n .. " x " .. n .. " x " .. n .. " Blocken.")
 
@@ -105,3 +98,20 @@ for ebene = 1, n do
                 sicherVor()
                 turtle.turnLeft()
             end
+        end
+    end
+
+    -- Wieder zum Start der Ebene
+    if n % 2 == 1 then
+        turtle.turnRight()
+        for i = 1, n - 1 do sicherVor() end
+        turtle.turnRight()
+    else
+        turtle.turnLeft()
+        for i = 1, n - 1 do sicherVor() end
+        turtle.turnLeft()
+    end
+
+    -- Naechste Ebene
+    if ebene < n then
+        sicherHoch()
