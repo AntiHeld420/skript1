@@ -6,7 +6,7 @@ function sicherVor()
         if not success or block.name ~= "minecraft:chest" then
             -- Wenn kein Kistenblock, dann vorwärts bewegen und graben (falls nötig)
             if not turtle.forward() then
-                turtle.dig()
+                turtle.dig()  -- Grabe nur, wenn es nicht die Kiste ist
                 sleep(0.5)
             end
             break  -- Verlasse die Schleife, sobald die Turtle erfolgreich vorwärts gegangen ist
