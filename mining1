@@ -68,12 +68,13 @@ function platzierenUnten()
     for i = 1, 16 do
         turtle.select(i)  -- Wähle den Slot
         if turtle.getItemCount(i) > 0 then  -- Wenn der Slot nicht leer ist
+            print("Versuche Block im Slot " .. i .. " zu platzieren...")
             local success = turtle.placeDown()  -- Versuche, den Block zu platzieren
             if success then
+                print("Block erfolgreich platziert!")
                 return true  -- Erfolgreich platziert
             else
                 print("Fehler beim Platzieren des Blocks im Slot " .. i)
-                return false  -- Fehler beim Platzieren
             end
         end
     end
