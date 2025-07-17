@@ -31,7 +31,7 @@ function auffuellenAusKiste()
     -- Blöcke aufnehmen (aus jedem Slot in der Kiste)
     for i = 1, 16 do
         turtle.select(i)
-        turtle.suck()
+        turtle.suck()  -- Diese Funktion nimmt nur die Items aus der Kiste und baut sie nicht ab
     end
 
     -- Zurück zur Arbeitsposition
