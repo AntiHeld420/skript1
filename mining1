@@ -28,7 +28,7 @@ function auffuellenAusKiste()
     umdrehen()
     sicherVor()  -- Zur Kiste hinter Start
 
-    -- Blocke aufnehmen (aus jedem Slot in der Kiste)
+    -- Sicherstellen, dass wir Items aufnehmen, ohne die Kiste abzubauen
     for i = 1, 16 do
         turtle.select(i)
         turtle.suck()  -- Diese Funktion nimmt nur die Items aus der Kiste und baut sie nicht ab
