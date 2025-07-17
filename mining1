@@ -115,3 +115,7 @@ for ebene = 1, n do
     -- Naechste Ebene
     if ebene < n then
         sicherHoch()
+    end
+end
+
+print("Fertig! Der Raum wurde vollstaendig gefuellt.")
