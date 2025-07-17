@@ -23,8 +23,8 @@ function umdrehen()
 end
 
 -- Funktion: Blöcke auffüllen aus Kiste hinter Startpunkt
-function auffüllenAusKiste()
-    print("Hole neue Blöcke aus der Kiste...")
+function auffullenAusKiste()
+    print("Hole neue Blocke aus der Kiste...")
 
     -- aktuelle Position speichern
     umdrehen()
@@ -43,7 +43,7 @@ function auffüllenAusKiste()
 end
 
 -- Funktion: prüfen, ob noch Blöcke vorhanden
-function hatBlöcke()
+function hatBlocke()
     for i = 1, 16 do
         if turtle.getItemCount(i) > 0 then
             return true
@@ -66,19 +66,65 @@ function platzierenUnten()
 end
 
 -- Eingabe der Raumgröße
-print("Gib die Seitenlänge des Raums (n) ein:")
+print("Gib die Seitenlange des Raums (n) ein:")
 local eingabe = read()
 local n = tonumber(eingabe)
 
 if not n or n < 1 then
-    print("Ungültige Eingabe.")
+    print("Ungueltige Eingabe.")
     return
 end
 
-print("Starte Füllen von " .. n .. " x " .. n .. " x " .. n .. " Blöcken.")
+print("Starte Fuellen von " .. n .. " x " .. n .. " x " .. n .. " Blocken.")
 
 -- Hauptschleife: Ebene für Ebene
 for ebene = 1, n do
     for reihe = 1, n do
         for spalte = 1, n do
-            if not hatBlöcke() then
+            if not hatBlocke() then
+                auffullenAusKiste()
+                if not hatBlocke() then
+                    print("Keine Blocke mehr verfuegbar. Abbruch.")
+                    return
+                end
+            end
+
+            platzierenUnten()
+
+            if spalte < n then
+                sicherVor()
+            end
+        end
+
+        -- Zeilenwechsel
+        if reihe < n then
+            if reihe % 2 == 1 then
+                turtle.turnRight()
+                sicherVor()
+                turtle.turnRight()
+            else
+                turtle.turnLeft()
+                sicherVor()
+                turtle.turnLeft()
+            end
+        end
+    end
+
+    -- Wieder zum Start der Ebene
+    if n % 2 == 1 then
+        turtle.turnRight()
+        for i = 1, n - 1 do sicherVor() end
+        turtle.turnRight()
+    else
+        turtle.turnLeft()
+        for i = 1, n - 1 do sicherVor() end
+        turtle.turnLeft()
+    end
+
+    -- Nächste Ebene
+    if ebene < n then
+        sicherHoch()
+    end
+end
+
+print("Fertig! Der Raum wurde vollstaendig gefuellt.")
